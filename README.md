@@ -43,4 +43,18 @@ docker exec -it -u dev <container> zsh
 | `/etc/ssh-keys/authorized_keys` | SSH public key (required for SSH access) |
 | `/etc/ssh` | Persist host keys across restarts |
 
+## Dotfiles
+
+chezmoi is included for importing your dotfiles on first login. Bring your shell config, neovim setup, Claude Code settings (`CLAUDE.md`, `~/.claude/`), git config, and more from a dotfiles repo:
+
+```bash
+chezmoi init --apply <github-username>
+```
+
+This is useful for:
+- Claude Code customizations (`CLAUDE.md`, settings, MCP servers)
+- Neovim configuration
+- zsh/bash aliases and functions
+- Git configuration
+
 See [docs/README.md](docs/README.md) for detailed configuration, building from source, and CI/CD information.
