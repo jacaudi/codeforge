@@ -35,7 +35,7 @@ jobs:
       image-ref: ${{ needs.build.outputs.image-ref }}
       command: |
         claude --version &&
-        vim --version | head -1 &&
+        nvim --version | head -1 &&
         git --version &&
         zsh --version &&
         curl --version | head -1 &&
@@ -43,6 +43,7 @@ jobs:
         glab --version &&
         yq --version &&
         jq --version &&
+        chezmoi --version &&
         id dev &&
         getent passwd dev | grep zsh &&
         grep 'PubkeyAuthentication yes' /etc/ssh/sshd_config &&

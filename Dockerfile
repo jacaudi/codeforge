@@ -6,7 +6,7 @@ ARG CLAUDE_CODE_VERSION=2.1.38
 # --- System packages ---
 RUN apk add --no-cache \
         openssh \
-        vim \
+        neovim \
         nano \
         zsh \
         git \
@@ -19,6 +19,7 @@ RUN apk add --no-cache \
 
 # --- CLI tools ---
 RUN apk add --no-cache \
+        chezmoi \
         github-cli \
         glab \
         yq \

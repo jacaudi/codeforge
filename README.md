@@ -7,10 +7,10 @@ Minimal remote development container with [Claude Code](https://claude.com/produ
 | Category | Tools |
 |----------|-------|
 | AI | Claude Code |
-| Editors | vim, nano |
+| Editors | neovim, nano |
 | Shell | zsh, oh-my-zsh, bash |
 | VCS | git, gh (GitHub CLI), glab (GitLab CLI) |
-| Utilities | curl, jq, yq, sudo |
+| Utilities | curl, jq, yq, chezmoi, sudo |
 
 ## Quick Start
 
