@@ -7,6 +7,7 @@ ARG CLAUDE_CODE_VERSION=2.1.33
 RUN apk add --no-cache \
         openssh \
         vim \
+        nano \
         zsh \
         git \
         curl \
@@ -35,7 +36,7 @@ RUN git clone --depth=1 https://github.com/ohmyzsh/ohmyzsh.git /home/dev/.oh-my-
 
 # --- Claude Code (direct binary, pinned version, musl for Alpine) ---
 ARG CLAUDE_CODE_URL=https://storage.googleapis.com/claude-code-dist-86c565f3-f756-42ad-8dfa-d59b1c096819/claude-code-releases/${CLAUDE_CODE_VERSION}/linux-x64-musl/claude
-RUN curl -fsSL "${CLAUDE_CODE_URL}" -o /usr/local/bin/claude \
+RUN curl -fsSL --retry 3 --retry-delay 5 "${CLAUDE_CODE_URL}" -o /usr/local/bin/claude \
     && chmod +x /usr/local/bin/claude
 
 # --- SSH configuration ---
