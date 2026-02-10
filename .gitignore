@@ -1,0 +1,5 @@
+docs/plans/**/*
+
+.env
+*.pem
+*.key
