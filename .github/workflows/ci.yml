@@ -6,8 +6,10 @@ on:
 
 permissions:
   contents: write
+  packages: write
   issues: write
   pull-requests: write
+  security-events: write
 
 jobs:
   lint:
@@ -16,8 +18,47 @@ jobs:
       shell: true
       shellcheck-paths: '.'
 
-  release:
+  build:
     needs: [lint]
+    uses: jacaudi/github-actions/.github/workflows/docker-build.yml@main
+    with:
+      platforms: linux/amd64
+      tags: |
+        ghcr.io/${{ github.repository }}:sha-${{ github.sha }}
+        ghcr.io/${{ github.repository }}:latest
+
+  scan:
+    needs: [build]
+    uses: jacaudi/github-actions/.github/workflows/image-scan.yml@main
+    with:
+      image-ref: ${{ needs.build.outputs.image-ref }}
+      severity: CRITICAL,HIGH
+      exit-code: 0
+
+  validate:
+    needs: [build]
+    uses: jacaudi/github-actions/.github/workflows/image-validate.yml@main
+    with:
+      image-ref: ${{ needs.build.outputs.image-ref }}
+      command: |
+        claude --version &&
+        vim --version | head -1 &&
+        git --version &&
+        zsh --version &&
+        curl --version | head -1 &&
+        gh --version | head -1 &&
+        glab --version &&
+        yq --version &&
+        jq --version &&
+        id dev &&
+        getent passwd dev | grep zsh &&
+        grep 'PubkeyAuthentication yes' /etc/ssh/sshd_config &&
+        grep 'PasswordAuthentication no' /etc/ssh/sshd_config &&
+        grep 'PermitRootLogin no' /etc/ssh/sshd_config &&
+        grep 'AllowUsers dev' /etc/ssh/sshd_config
+
+  release:
+    needs: [scan, validate]
     uses: jacaudi/github-actions/.github/workflows/semantic-release.yml@main
     with:
       allow-initial-development-versions: true

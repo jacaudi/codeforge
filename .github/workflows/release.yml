@@ -1,0 +1,29 @@
+name: Release
+
+on:
+  push:
+    tags: ['v*']
+
+permissions:
+  contents: read
+  packages: write
+  security-events: write
+
+jobs:
+  build:
+    uses: jacaudi/github-actions/.github/workflows/docker-build.yml@main
+    with:
+      platforms: linux/amd64
+      tags: |
+        ghcr.io/${{ github.repository }}:${{ github.ref_name }}
+        ghcr.io/${{ github.repository }}:sha-${{ github.sha }}
+        ghcr.io/${{ github.repository }}:latest
+      version: ${{ github.ref_name }}
+
+  scan:
+    needs: [build]
+    uses: jacaudi/github-actions/.github/workflows/image-scan.yml@main
+    with:
+      image-ref: ${{ needs.build.outputs.image-ref }}
+      severity: CRITICAL,HIGH
+      exit-code: 0
