@@ -88,23 +88,16 @@ RUN mkdir -p /opt/codeforge/defaults/etc/ssh \
     && cp -a /home/coder /opt/codeforge/defaults/home-coder
 
 # --- MOTD ---
+COPY src/motd /etc/motd
 RUN NVIM_VER=$(nvim --version | head -1 | awk '{print $2}') \
     && TMUX_VER=$(tmux -V | awk '{print $2}') \
     && CHEZMOI_VER=$(chezmoi --version | awk '{print $3}' | sed 's/,//') \
-    && printf '%s\n' \
-    '' \
-    '   ██████╗ ██████╗ ██████╗ ███████╗███████╗ ██████╗ ██████╗  ██████╗ ███████╗' \
-    '  ██╔════╝██╔═══██╗██╔══██╗██╔════╝██╔════╝██╔═══██╗██╔══██╗██╔════╝ ██╔════╝' \
-    '  ██║     ██║   ██║██║  ██║█████╗  █████╗  ██║   ██║██████╔╝██║  ███╗█████╗  ' \
-    '  ██║     ██║   ██║██║  ██║██╔══╝  ██╔══╝  ██║   ██║██╔══██╗██║   ██║██╔══╝  ' \
-    '  ╚██████╗╚██████╔╝██████╔╝███████╗██║     ╚██████╔╝██║  ██║╚██████╔╝███████╗' \
-    '   ╚═════╝ ╚═════╝ ╚═════╝ ╚══════╝╚═╝      ╚═════╝ ╚═╝  ╚═╝ ╚═════╝ ╚══════╝' \
-    '' \
-    '  Remote Development Container' \
-    "  claude ${CLAUDE_CODE_VERSION}  neovim ${NVIM_VER}  tmux ${TMUX_VER}  chezmoi ${CHEZMOI_VER}" \
-    '' \
-    '  tmux: Ctrl-b d detach | Ctrl-b c new window | Ctrl-b n/p next/prev window' \
-    '' > /etc/motd
+    && sed -i \
+        -e "s/__CLAUDE_CODE_VERSION__/${CLAUDE_CODE_VERSION}/" \
+        -e "s/__NVIM_VER__/${NVIM_VER}/" \
+        -e "s/__TMUX_VER__/${TMUX_VER}/" \
+        -e "s/__CHEZMOI_VER__/${CHEZMOI_VER}/" \
+        /etc/motd
 
 # --- Entrypoint ---
 COPY src/entrypoint.sh /entrypoint.sh
