@@ -11,6 +11,8 @@ Remote development container with [Claude Code](https://claude.com/product/claud
 - **Shell** zsh with oh-my-zsh, plus bash
 - **Editors** neovim, nano
 - **Git tooling** git, GitHub CLI, GitLab CLI
+- **Terminal multiplexers** tmux, screen
+- **Productivity** nightshift, td
 - **Data tools** jq, yq
 - **Non-root** `coder` user with passwordless sudo
 

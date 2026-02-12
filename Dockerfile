@@ -1,3 +1,8 @@
+FROM public.ecr.aws/docker/library/alpine:3.23 AS go-builder
+RUN apk add --no-cache go
+RUN GOBIN=/go/bin go install github.com/marcus/nightshift/cmd/nightshift@v0.3.1
+RUN GOBIN=/go/bin go install github.com/marcus/td@v0.34.0
+
 FROM public.ecr.aws/docker/library/alpine:3.23
 
 # --- Pinned versions ---
@@ -23,7 +28,9 @@ RUN apk add --no-cache \
         github-cli \
         glab \
         yq \
-        jq
+        jq \
+        tmux \
+        screen
 
 # --- Create coder user ---
 RUN addgroup coder \
@@ -48,6 +55,10 @@ RUN case "${TARGETARCH}" in \
         "https://storage.googleapis.com/claude-code-dist-86c565f3-f756-42ad-8dfa-d59b1c096819/claude-code-releases/${CLAUDE_CODE_VERSION}/${ARCH_PATH}/claude" \
         -o /usr/local/bin/claude \
     && chmod +x /usr/local/bin/claude
+
+# --- Go binaries ---
+COPY --from=go-builder /go/bin/nightshift /usr/local/bin/nightshift
+COPY --from=go-builder /go/bin/td /usr/local/bin/td
 
 # --- SSH configuration ---
 RUN mkdir -p /home/coder/.ssh \
