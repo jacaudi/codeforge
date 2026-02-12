@@ -35,5 +35,18 @@ if [ -n "${CLAUDE_CODE_OAUTH_TOKEN:-}" ]; then
     chmod 600 /home/coder/.zshenv
 fi
 
+# Set hasCompletedOnboarding for headless Claude Code sessions
+CLAUDE_JSON="/home/coder/.claude.json"
+if [ -n "${CLAUDE_CODE_OAUTH_TOKEN:-}" ]; then
+    if [ -f "$CLAUDE_JSON" ]; then
+        jq '. + {"hasCompletedOnboarding": true}' "$CLAUDE_JSON" > "${CLAUDE_JSON}.tmp" \
+            && mv "${CLAUDE_JSON}.tmp" "$CLAUDE_JSON"
+    else
+        echo '{"hasCompletedOnboarding": true}' > "$CLAUDE_JSON"
+    fi
+    chown coder:coder "$CLAUDE_JSON"
+    chmod 600 "$CLAUDE_JSON"
+fi
+
 # Start sshd in foreground
 exec /usr/sbin/sshd -D -e
