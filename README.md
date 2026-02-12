@@ -4,17 +4,19 @@ Remote development container with [Claude Code](https://claude.com/product/claud
 
 ## Features
 
-- **Claude Code** pre-installed and ready to use
-- **Multi-arch** native amd64 and arm64 images
-- **SSH access** with public key authentication (password auth disabled)
-- **Dotfile management** with chezmoi
-- **Shell** zsh with oh-my-zsh, plus bash
-- **Editors** neovim, nano
-- **Git tooling** git, GitHub CLI, GitLab CLI
-- **Terminal multiplexers** tmux, screen
-- **Productivity** nightshift, td
-- **Data tools** jq, yq
-- **Non-root** `coder` user with passwordless sudo
+| Category | Details |
+|----------|---------|
+| Claude Code | Pre-installed and ready to use |
+| Multi-arch | Native amd64 and arm64 images |
+| SSH access | Public key authentication (password auth disabled) |
+| Dotfile management | chezmoi |
+| Shell | zsh with oh-my-zsh, bash |
+| Editors | neovim, nano |
+| Git tooling | git, GitHub CLI, GitLab CLI |
+| Terminal multiplexers | tmux, screen |
+| Productivity | nightshift, td |
+| Data tools | jq, yq |
+| Non-root | `coder` user with passwordless sudo |
 
 ## Quick Start
 
