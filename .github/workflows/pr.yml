@@ -53,4 +53,5 @@ jobs:
         grep 'PubkeyAuthentication yes' /etc/ssh/sshd_config &&
         grep 'PasswordAuthentication no' /etc/ssh/sshd_config &&
         grep 'PermitRootLogin no' /etc/ssh/sshd_config &&
-        grep 'AllowUsers coder' /etc/ssh/sshd_config
+        grep 'AllowUsers coder' /etc/ssh/sshd_config &&
+        grep 'PrintMotd no' /etc/ssh/sshd_config

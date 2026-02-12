@@ -1,12 +1,16 @@
 FROM public.ecr.aws/docker/library/alpine:3.23 AS go-builder
+ARG NIGHTSHIFT_VERSION=0.3.1
+ARG TD_VERSION=0.34.0
 RUN apk add --no-cache go
-RUN GOBIN=/go/bin go install github.com/marcus/nightshift/cmd/nightshift@v0.3.1
-RUN GOBIN=/go/bin go install github.com/marcus/td@v0.34.0
+RUN GOBIN=/go/bin go install github.com/marcus/nightshift/cmd/nightshift@v${NIGHTSHIFT_VERSION}
+RUN GOBIN=/go/bin go install github.com/marcus/td@v${TD_VERSION}
 
 FROM public.ecr.aws/docker/library/alpine:3.23
 
 # --- Pinned versions ---
-ARG CLAUDE_CODE_VERSION=2.1.38
+ARG CLAUDE_CODE_VERSION=2.1.39
+ARG NIGHTSHIFT_VERSION=0.3.1
+ARG TD_VERSION=0.34.0
 
 # --- System packages ---
 RUN apk add --no-cache \
@@ -72,10 +76,11 @@ RUN sed -i \
         -e 's/^#KbdInteractiveAuthentication yes/KbdInteractiveAuthentication no/' \
         /etc/ssh/sshd_config \
     && echo 'AllowUsers coder' >> /etc/ssh/sshd_config \
-    && echo 'AuthenticationMethods publickey' >> /etc/ssh/sshd_config
+    && echo 'AuthenticationMethods publickey' >> /etc/ssh/sshd_config \
+    && echo 'PrintMotd no' >> /etc/ssh/sshd_config
 
 # --- tmux auto-attach on SSH login ---
-COPY zlogin /etc/zsh/zlogin
+COPY src/zprofile /etc/zsh/zprofile
 
 # --- Backup defaults for volume mount initialization ---
 RUN mkdir -p /opt/codeforge/defaults/etc/ssh \
@@ -83,7 +88,10 @@ RUN mkdir -p /opt/codeforge/defaults/etc/ssh \
     && cp -a /home/coder /opt/codeforge/defaults/home-coder
 
 # --- MOTD ---
-RUN printf '%s\n' \
+RUN NVIM_VER=$(nvim --version | head -1 | awk '{print $2}') \
+    && TMUX_VER=$(tmux -V | awk '{print $2}') \
+    && CHEZMOI_VER=$(chezmoi --version | awk '{print $3}' | sed 's/,//') \
+    && printf '%s\n' \
     '' \
     '   ██████╗ ██████╗ ██████╗ ███████╗███████╗ ██████╗ ██████╗  ██████╗ ███████╗' \
     '  ██╔════╝██╔═══██╗██╔══██╗██╔════╝██╔════╝██╔═══██╗██╔══██╗██╔════╝ ██╔════╝' \
@@ -92,14 +100,14 @@ RUN printf '%s\n' \
     '  ╚██████╗╚██████╔╝██████╔╝███████╗██║     ╚██████╔╝██║  ██║╚██████╔╝███████╗' \
     '   ╚═════╝ ╚═════╝ ╚═════╝ ╚══════╝╚═╝      ╚═════╝ ╚═╝  ╚═╝ ╚═════╝ ╚══════╝' \
     '' \
-    '  Remote development container' \
-    "  Claude Code ${CLAUDE_CODE_VERSION}" \
+    '  Remote Development Container' \
+    "  claude ${CLAUDE_CODE_VERSION}  neovim ${NVIM_VER}  tmux ${TMUX_VER}  chezmoi ${CHEZMOI_VER}" \
     '' \
     '  tmux: Ctrl-b d detach | Ctrl-b c new window | Ctrl-b n/p next/prev window' \
     '' > /etc/motd
 
 # --- Entrypoint ---
-COPY entrypoint.sh /entrypoint.sh
+COPY src/entrypoint.sh /entrypoint.sh
 RUN chmod +x /entrypoint.sh
 
 EXPOSE 22
